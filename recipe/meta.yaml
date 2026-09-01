@@ -1,5 +1,5 @@
 {% set name = "pycolmap" %}
-{% set version = "4.1.1" %}
+{% set version = "4.2.0" %}
 
 package:
   name: {{ name }}
@@ -7,13 +7,13 @@ package:
 
 source:
   - url: https://github.com/colmap/colmap/archive/{{ version }}.zip
-    sha256: aa12bcb6c857107abe4518261e0739e5fc1af40d460aae4ff03c031b893916b1
+    sha256: c8ed75bb24725977e3dc96603014f43b21470b19b7f23dd7daa0666cb55c23fb
     patches:
       - disable-parallel-builds.patch    # [win]
       - bump-min-cmake.patch
 
 build:
-  number: 2
+  number: 0
   script:
     - set CMAKE_BUILD_TYPE=Release         # [win]
     - set CMAKE_BUILD_PARALLEL_LEVEL=1     # [win]
@@ -31,7 +31,7 @@ build:
     - export CMAKE_ARGS="${CMAKE_ARGS} -DGENERATE_STUBS=OFF"                                                    # [build_platform != target_platform]
     - {{ PYTHON }} -m pip install . -vv --no-build-isolation --no-deps
   string: cuda{{ cuda_compiler_version | replace('.', '') }}py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version not in (undefined, "None")]
-  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}                                                # [cuda_compiler_version in (undefined, "None")]
+  string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version in (undefined, "None")]
   # weigh down cpu implementation and give cuda preference
   track_features:
     - pycolmap-cpu  # [cuda_compiler_version in (undefined, "None")]
@@ -102,12 +102,12 @@ requirements:
 # aarch64 failing tests
 # /lib64/libm.so.6: version `GLIBC_2.27' not found
 test:
-  imports:                                                                                                       # [not aarch64]
+  imports:   # [not aarch64]
     - pycolmap                                                                                                   # [not aarch64]
-  commands:                                                                                                      # [not aarch64]
+  commands:   # [not aarch64]
     - pip check                                                                                                  # [not aarch64]
     - python -c "import pycolmap; reconstruction = pycolmap.Reconstruction(); x = reconstruction.points3D"       # [not aarch64]
-  requires:                                                                                                      # [not aarch64]
+  requires:   # [not aarch64]
     - pip                                                                                                        # [not aarch64]
 
 about:
